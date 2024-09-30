@@ -1,3 +1,28 @@
+logging:
+  level:
+    org.springframework: DEBUG
+    com.etna.gpe.mycloseshop: DEBUG
+    slf4j: DEBUG
+    org.springframework.security: DEBUG
+server:
+  port: ${SPRING_APP_URL:8081}
+  servlet:
+    context-path: /api/ms-commerce
 spring:
   application:
     name: ms-commerce
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/db-ms-commerce?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:secret}
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database: mysql
+#springdoc:
+#  api-docs:
+#    enabled: true
+#  swagger-ui:
+#    path: /swagger-ui.html
