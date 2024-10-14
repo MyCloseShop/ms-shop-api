@@ -18,7 +18,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # A modifier si besoin `create` ou `update`
     show-sql: true
     database: mysql
 #springdoc:

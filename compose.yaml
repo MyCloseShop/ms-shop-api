@@ -8,6 +8,7 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
+  # peut etre commenté si ça build pas
   server-ms-commerce:
     build:
       context: .
@@ -24,6 +25,7 @@ services:
         - 'SPRING_RABBITMQ_HOST=rabbitmq'
         - 'SPRING_RABBITMQ_PORT=5672'
 
+### juste lancé ça si au dessus ça build pas
   db-ms-commerce:
     container_name: 'db-ms-commerce'
     image: 'mysql:latest'

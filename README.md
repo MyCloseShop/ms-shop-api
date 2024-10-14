@@ -1,20 +1,22 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# MS-COMMERCE
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+## Description
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+`mvn clean && install`
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+```yaml
+datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/db-ms-commerce?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:secret}
+```
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+Ensuite `docker compose up -d db-ms-commerce`
+
+Ensuite pour run le projet, juste lancé l'app, si besoin changé dans le `resources/application.yml` les urls et port pour la
+connection à la base de données lancé depuis docker.
+
+À changé si besoin avant de lancé l'app:
+
+
+En plus vérifier si la base est bien créé sur le container... 😉 
