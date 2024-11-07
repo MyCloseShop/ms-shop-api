@@ -1,0 +1,119 @@
+package com.etna.gpe.mycloseshop.ms_shop_api.services;
+
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.CreateShopWithLocationAndOpeningHoursDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.CreatedShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.ShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.entity.Location;
+import com.etna.gpe.mycloseshop.ms_shop_api.entity.OpeningHours;
+import com.etna.gpe.mycloseshop.ms_shop_api.entity.Shop;
+import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
+import com.etna.gpe.mycloseshop.security_api.entity.JwtUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
+
+@Service
+public class ShopService implements IShopService {
+    private final IShopRepository shopRepository;
+    private final Logger logger = Logger.getLogger(ShopService.class.getName());
+
+    public ShopService(IShopRepository shopRepository) {
+        this.shopRepository = shopRepository;
+    }
+
+
+    @Override
+    public CreatedShopDto createShop(CreateShopWithLocationAndOpeningHoursDto shopDto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
+
+        logger.info("Principal id : " + jwtUserDetails.getUserId());
+
+        // log the username
+        logger.info("User " + authentication.getName() + " is creating a shop");
+
+        Location location = new Location();
+        location.setAddress(shopDto.getLocation().getAddress());
+        location.setCity(shopDto.getLocation().getCity());
+        location.setPostalCode(shopDto.getLocation().getPostalCode());
+        location.setOptionalInformation(shopDto.getLocation().getOptionalInformation());
+
+        List<OpeningHours> openingHours = shopDto.getOpeningHours().stream().map(openingHoursDto -> {
+            OpeningHours openingHours1 = new OpeningHours();
+            openingHours1.setDayOfWeek(openingHoursDto.getDay());
+            openingHours1.setStartTime(Instant.parse(openingHoursDto.getOpening()));
+            openingHours1.setEndTime(Instant.parse(openingHoursDto.getClosing()));
+            return openingHours1;
+        }).toList();
+
+        Shop shop = new Shop();
+        shop.setName(shopDto.getName());
+        shop.setDescription(shopDto.getDescription());
+        shop.setLocation(location);
+        shop.setOpeningHours(openingHours);
+        shop.setUserId(shopDto.getUserId());
+
+        // link location to shop
+        location.setShop(shop);
+
+        // link opening hours to shop
+        openingHours.forEach(oh -> oh.setShop(shop));
+
+        Shop savedShop = shopRepository.save(shop);
+
+        CreatedShopDto createdShopDto = new CreatedShopDto();
+        createdShopDto.setId(savedShop.getId());
+        createdShopDto.setName(savedShop.getName());
+        createdShopDto.setDescription(savedShop.getDescription());
+        createdShopDto.setUserId(savedShop.getUserId());
+        createdShopDto.setLocation(savedShop.getLocation().getId());
+        createdShopDto.setOpeningHours(
+                savedShop.getOpeningHours().stream().map(OpeningHours::getId).toList()
+        );
+        createdShopDto.setCreatedAt(savedShop.getCreatedAt().toString());
+        createdShopDto.setUpdatedAt(savedShop.getUpdatedAt().toString());
+
+        return createdShopDto;
+    }
+
+    @Override
+    public List<ShopDto> getShops() {
+        return shopRepository.findAll().stream().map(
+                shop -> new ShopDto().toBuilder()
+                    .shopId(shop.getId())
+                    .name(shop.getName())
+                    .description(shop.getDescription())
+                    .ownerId(shop.getUserId())
+                    .locationId(shop.getLocation().getId())
+                    .openingHoursIds(
+                            shop.getOpeningHours().stream().map(OpeningHours::getId).toList()
+                    )
+                    .build()
+        ).toList();
+    }
+
+    @Override
+    public ShopDto getShop(String shopId) {
+        try {
+            Shop shop = shopRepository.findById(UUID.fromString(shopId)).orElseThrow();
+            return new ShopDto().toBuilder()
+                    .shopId(shop.getId())
+                    .name(shop.getName())
+                    .description(shop.getDescription())
+                    .ownerId(shop.getUserId())
+                    .locationId(shop.getLocation().getId())
+                    .openingHoursIds(
+                            shop.getOpeningHours().stream().map(OpeningHours::getId).toList()
+                    )
+                    .build();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid shop id");
+        }
+    }
+}

@@ -2,27 +2,30 @@ logging:
   level:
     org.springframework: DEBUG
     com.etna.gpe.mycloseshop: DEBUG
+    com.etna.gpe.mycloseshop.security_api: DEBUG
     slf4j: DEBUG
     org.springframework.security: DEBUG
 server:
-  port: ${SPRING_APP_URL:8081}
+  port: ${SPRING_APP_PORT:8080}
   servlet:
-    context-path: /api/ms-commerce
+    context-path: /api/ms-shop-api
 spring:
   application:
-    name: ms-commerce
+    name: ms-shop-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/db-ms-commerce?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/db-ms-shop?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC}
     username: ${SPRING_DATASOURCE_USERNAME:user}
     password: ${SPRING_DATASOURCE_PASSWORD:secret}
     driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update # A modifier si besoin `create` ou `update`
+      ddl-auto: create # A modifier si besoin `create` ou `update`
     show-sql: true
     database: mysql
-#springdoc:
-#  api-docs:
-#    enabled: true
-#  swagger-ui:
-#    path: /swagger-ui.html
+  main:
+    allow-bean-definition-overriding: true
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html

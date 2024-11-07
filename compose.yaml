@@ -8,34 +8,34 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  # peut etre commenté si ça build pas
-  server-ms-commerce:
-    build:
-      context: .
+
+  server-ms-shop:
+    container_name: 'server-ms-shop'
+    image: 'redsnoww/ms-shop-api:0.1.0'
     ports:
-      - "8081:8081"
+      - "8082:8080"
     depends_on:
-      db-ms-commerce:
+      db-ms-shop:
         condition: service_healthy
     environment:
-        - 'SPRING_APP_URL=8081'
-        - 'SPRING_DATASOURCE_URL=jdbc:mysql://db-ms-login:3306/db-ms-commerce'
+        - 'SPRING_APP_PORT=8080'
+        - 'SPRING_DATASOURCE_URL=jdbc:mysql://db-ms-shop:3306/db-ms-shop'
         - 'SPRING_DATASOURCE_USERNAME=user'
         - 'SPRING_DATASOURCE_PASSWORD=secret'
         - 'SPRING_RABBITMQ_HOST=rabbitmq'
         - 'SPRING_RABBITMQ_PORT=5672'
 
 ### juste lancé ça si au dessus ça build pas
-  db-ms-commerce:
-    container_name: 'db-ms-commerce'
+  db-ms-shop:
+    container_name: 'db-ms-shop'
     image: 'mysql:latest'
     environment:
-      - 'MYSQL_DATABASE=db-ms-commerce'
+      - 'MYSQL_DATABASE=db-ms-shop'
       - 'MYSQL_PASSWORD=secret'
       - 'MYSQL_ROOT_PASSWORD=secret'
       - 'MYSQL_USER=user'
     ports:
-      - '3307:3306'
+      - '3308:3306'
     healthcheck:
         test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
         interval: 10s
