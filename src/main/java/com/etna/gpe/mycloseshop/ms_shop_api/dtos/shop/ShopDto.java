@@ -1,4 +1,4 @@
-package com.etna.gpe.mycloseshop.ms_shop_api.dtos;
+package com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop;
 
 
 import lombok.AllArgsConstructor;

@@ -1,5 +1,7 @@
-package com.etna.gpe.mycloseshop.ms_shop_api.dtos;
+package com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop;
 
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.location.CreateLocationDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.CreateOpeningHoursDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;

@@ -1,11 +1,15 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.services;
 
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.CreateShopWithLocationAndOpeningHoursDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.CreatedShopDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.ShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.location.LocationDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreateShopWithLocationAndOpeningHoursDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreatedShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Location;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.OpeningHours;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Shop;
+import com.etna.gpe.mycloseshop.ms_shop_api.mappers.ILocationMapper;
+import com.etna.gpe.mycloseshop.ms_shop_api.mappers.IOpeningHoursMapper;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
 import com.etna.gpe.mycloseshop.security_api.entity.JwtUserDetails;
 import org.springframework.security.core.Authentication;
@@ -21,9 +25,17 @@ import java.util.logging.Logger;
 public class ShopService implements IShopService {
     private final IShopRepository shopRepository;
     private final Logger logger = Logger.getLogger(ShopService.class.getName());
+    private final IOpeningHoursMapper openingHoursMapper;
+    private final ILocationMapper locationMapper;
 
-    public ShopService(IShopRepository shopRepository) {
+    public ShopService(
+            IShopRepository shopRepository,
+            IOpeningHoursMapper openingHoursMapper,
+            ILocationMapper locationMapper
+    ) {
         this.shopRepository = shopRepository;
+        this.openingHoursMapper = openingHoursMapper;
+        this.locationMapper = locationMapper;
     }
 
 
@@ -115,5 +127,17 @@ public class ShopService implements IShopService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid shop id");
         }
+    }
+
+    @Override
+    public List<OpeningHoursDto> getShopOpeningHours(String shopId) {
+        Shop shop = shopRepository.findById(UUID.fromString(shopId)).orElseThrow();
+        return shop.getOpeningHours().stream().map(openingHoursMapper::toDto).toList();
+    }
+
+    @Override
+    public LocationDto getShopLocation(String shopId) {
+        Shop shop = shopRepository.findById(UUID.fromString(shopId)).orElseThrow();
+        return locationMapper.toDto(shop.getLocation());
     }
 }

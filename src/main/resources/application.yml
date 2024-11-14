@@ -6,12 +6,13 @@ logging:
     slf4j: DEBUG
     org.springframework.security: DEBUG
 server:
-  port: ${SPRING_APP_PORT:8080}
+  port: ${SPRING_APP_PORT:8081}
   servlet:
     context-path: /api/ms-shop-api
 spring:
   application:
     name: ms-shop-api
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/db-ms-shop?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC}
     username: ${SPRING_DATASOURCE_USERNAME:user}
@@ -24,6 +25,7 @@ spring:
     database: mysql
   main:
     allow-bean-definition-overriding: true
+
 springdoc:
   api-docs:
     enabled: true

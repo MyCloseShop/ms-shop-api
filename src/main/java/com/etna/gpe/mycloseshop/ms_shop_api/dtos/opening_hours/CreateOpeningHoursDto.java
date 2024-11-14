@@ -1,4 +1,4 @@
-package com.etna.gpe.mycloseshop.ms_shop_api.dtos;
+package com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours;
 
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.DayOfWeek;
 

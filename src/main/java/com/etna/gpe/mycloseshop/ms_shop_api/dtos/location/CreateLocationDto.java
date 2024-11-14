@@ -1,4 +1,4 @@
-package com.etna.gpe.mycloseshop.ms_shop_api.dtos;
+package com.etna.gpe.mycloseshop.ms_shop_api.dtos.location;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

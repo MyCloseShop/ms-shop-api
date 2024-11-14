@@ -1,11 +1,14 @@
-package com.etna.gpe.mycloseshop.ms_shop_api.controllers;
+package com.etna.gpe.mycloseshop.ms_shop_api.controllers.shop;
 
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.CreateShopWithLocationAndOpeningHoursDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.CreatedShopDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.ShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.error.ResponseError;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.location.LocationDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreateShopWithLocationAndOpeningHoursDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreatedShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,7 +60,10 @@ public interface IShopController {
                             responseCode = "200",
                             description = "Shops found",
                             content = @Content(
-                                    schema = @Schema(implementation = ShopDto.class)
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = ShopDto.class)
+                                    )
                             )
                     ),
                     @ApiResponse(
@@ -99,6 +105,75 @@ public interface IShopController {
             }
     )
     ResponseEntity<ShopDto> getShop(
+            @Parameter(description = "Shop id", required = true)
+            @PathVariable("shopId")
+            String shopId
+    );
+
+    @GetMapping(path = "/{shopId}/opening-hours")
+    @Operation(summary = "Get opening hours of a shop", description = "Get the opening hours of a shop by its id")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Opening hours found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                     array = @ArraySchema(
+                                                schema = @Schema(implementation = OpeningHoursDto.class)
+                                     )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Shop not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    )
+            }
+    )
+    ResponseEntity<List<OpeningHoursDto>> getShopOpeningHours(
+            @Parameter(description = "Shop id", required = true)
+            @PathVariable("shopId")
+            String shopId
+    );
+
+    @GetMapping(path = "/{shopId}/location")
+    @Operation(summary = "Get location of a shop", description = "Get the location of a shop by its id")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Location found",
+                            content = @Content(
+                                    schema = @Schema(implementation = LocationDto.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Shop not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    )
+            }
+    )
+    ResponseEntity<LocationDto> getShopLocation(
             @Parameter(description = "Shop id", required = true)
             @PathVariable("shopId")
             String shopId

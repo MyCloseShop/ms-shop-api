@@ -12,6 +12,7 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "location")
+@Getter
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -57,10 +59,6 @@ public class Location {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Date.from(Instant.now());
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public void setId(UUID id) {

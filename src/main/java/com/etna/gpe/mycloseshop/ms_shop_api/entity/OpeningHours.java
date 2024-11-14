@@ -15,12 +15,14 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
+@Getter
 @Table(name = "opening_hours")
 public class OpeningHours {
     @Id
@@ -58,10 +60,6 @@ public class OpeningHours {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Date.from(Instant.now());
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public void setId(UUID id) {
