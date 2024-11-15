@@ -1,4 +1,4 @@
-package com.etna.gpe.mycloseshop.ms_shop_api.services;
+package com.etna.gpe.mycloseshop.ms_shop_api.services.shop;
 
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.location.LocationDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;

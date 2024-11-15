@@ -5,7 +5,7 @@ import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreateShopWithLocationAndOpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreatedShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.services.IShopService;
+import com.etna.gpe.mycloseshop.ms_shop_api.services.shop.IShopService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
