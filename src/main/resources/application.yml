@@ -6,7 +6,7 @@ logging:
     slf4j: DEBUG
     org.springframework.security: DEBUG
 server:
-  port: ${SPRING_APP_PORT:8081}
+  port: ${SPRING_APP_PORT:8082}
   servlet:
     context-path: /api/ms-shop-api
 spring:
@@ -20,7 +20,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create # A modifier si besoin `create` ou `update`
+      ddl-auto: update # A modifier si besoin `create` ou `update`
     show-sql: true
     database: mysql
   main:

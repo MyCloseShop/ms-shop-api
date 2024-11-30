@@ -2,8 +2,6 @@ package com.etna.gpe.mycloseshop.ms_shop_api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,24 +14,36 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
 @Getter
-@Table(name = "opening_hours")
-public class OpeningHours {
+@Setter
+@Table(name = "appointment")
+public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "day_of_week", nullable = false)
-    private DayOfWeek dayOfWeek;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id", nullable = false)
+    private Shop shop;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_id", nullable = false)
+    private Service service;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
+
+    @Column(name = "appointment_date", nullable = false)
+    private LocalDate appointmentDate;
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
@@ -41,9 +51,8 @@ public class OpeningHours {
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id", nullable = false)
-    private Shop shop;
+    @Column(name = "status", nullable = false)
+    private AppointmentStatus status;
 
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -64,31 +73,4 @@ public class OpeningHours {
         this.updatedAt = Date.from(Instant.now());
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public void setDayOfWeek(DayOfWeek dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public void setShop(Shop shop) {
-        this.shop = shop;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

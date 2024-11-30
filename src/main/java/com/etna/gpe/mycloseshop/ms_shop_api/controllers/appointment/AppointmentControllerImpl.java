@@ -1,0 +1,44 @@
+package com.etna.gpe.mycloseshop.ms_shop_api.controllers.appointment;
+
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentResponse;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.CreateAppointmentRequest;
+import com.etna.gpe.mycloseshop.ms_shop_api.services.appointment.IAppointmentService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+public class AppointmentControllerImpl implements IAppointmentController{
+
+    private final IAppointmentService appointmentService;
+
+    public AppointmentControllerImpl(IAppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
+    }
+
+    @Override
+    public ResponseEntity<List<LocalTime>> getAvailableSlots(String shopId, String serviceId, LocalDate date) {
+        return ResponseEntity.ok(appointmentService.getAvailableSlots(shopId, date, serviceId));
+    }
+
+    @Override
+    public ResponseEntity<AppointmentResponse> bookAppointment(CreateAppointmentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(request));
+    }
+
+    @Override
+    public ResponseEntity<List<AppointmentDto>> getAppointmentsByShopId(UUID shopId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByShopId(shopId));
+    }
+
+    @Override
+    public ResponseEntity<List<AppointmentDto>> getAppointmentsByClientId(UUID clientId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
+    }
+}

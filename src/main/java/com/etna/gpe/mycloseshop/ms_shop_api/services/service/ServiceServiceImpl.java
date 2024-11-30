@@ -53,7 +53,7 @@ public class ServiceServiceImpl implements IServiceService {
 
     @Override
     public ServiceDto getServiceById(String serviceId) {
-        return serviceRepository.findById(Integer.parseInt(serviceId))
+        return serviceRepository.findById(UUID.fromString(serviceId))
                 .map(serviceMapper::toDto)
                 .orElseThrow();
     }

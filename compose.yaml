@@ -11,7 +11,7 @@ services:
 
   server-ms-shop:
     container_name: 'server-ms-shop'
-    image: 'redsnoww/ms-shop-api:0.1.0'
+    image: 'redsnoww/ms-shop-api:0.5.0'
     ports:
       - "8082:8080"
     depends_on:

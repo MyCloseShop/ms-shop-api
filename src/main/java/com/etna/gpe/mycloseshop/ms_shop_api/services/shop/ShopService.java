@@ -16,7 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -59,8 +59,8 @@ public class ShopService implements IShopService {
         List<OpeningHours> openingHours = shopDto.getOpeningHours().stream().map(openingHoursDto -> {
             OpeningHours openingHours1 = new OpeningHours();
             openingHours1.setDayOfWeek(openingHoursDto.getDay());
-            openingHours1.setStartTime(Instant.parse(openingHoursDto.getOpening()));
-            openingHours1.setEndTime(Instant.parse(openingHoursDto.getClosing()));
+            openingHours1.setStartTime(LocalTime.parse(openingHoursDto.getOpening()));
+            openingHours1.setEndTime(LocalTime.parse(openingHoursDto.getClosing()));
             return openingHours1;
         }).toList();
 

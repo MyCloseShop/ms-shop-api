@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface IServiceRepository extends JpaRepository<Service, Integer> {
+public interface IServiceRepository extends JpaRepository<Service, UUID> {
     List<Service> findAllByShopId(UUID shopId);
 }

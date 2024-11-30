@@ -21,6 +21,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -31,8 +32,8 @@ import java.util.Date;
 @Table(name = "service")
 public class Service {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)
