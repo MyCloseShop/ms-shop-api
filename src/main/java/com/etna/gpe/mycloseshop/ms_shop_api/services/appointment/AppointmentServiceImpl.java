@@ -1,6 +1,6 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.services.appointment;
 
-import com.etna.gpe.mycloseshop.common_api.ms_login.api.IUserController;
+import com.etna.gpe.mycloseshop.common_api.ms_login.api.IUserApiFeign;
 import com.etna.gpe.mycloseshop.common_api.ms_login.dto.UserDtoWithRoles;
 import com.etna.gpe.mycloseshop.common_api.ms_login.dto.success.ResponseSuccess;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentDto;
@@ -40,7 +40,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
     private final RabbitTemplate rabbitTemplate;
     // init logger
     private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
-    private final IUserController userController;
+    private final IUserApiFeign userController;
 
     public AppointmentServiceImpl(
             IAppointmentRepository appointmentRepository,
@@ -48,7 +48,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
             IServiceRepository serviceRepository,
             IAppointmentMapper appointmentMapper,
             RabbitTemplate rabbitTemplate,
-            IUserController userController
+            IUserApiFeign userController
     ) {
         this.appointmentRepository = appointmentRepository;
         this.shopRepository = shopRepository;

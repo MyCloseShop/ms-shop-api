@@ -1,0 +1,75 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class Appointment {
+   createdAt: Date
+   service: Service
+   appointmentDate: LocalDate
+   updatedAt: Date
+   endTime: LocalTime
+   userId: UUID
+   status: AppointmentStatus
+   id: UUID
+   shop: Shop
+   startTime: LocalTime
+}
+enum AppointmentStatus << enumeration >> {
+    CONFIRMED
+    CANCELED
+    PENDING
+    COMPLETED
+}
+class Location {
+   createdAt: Date
+   updatedAt: Date
+   optionalInformation: String
+   city: String
+   id: UUID
+   address: String
+   postalCode: String
+   shop: Shop
+}
+class OpeningHours {
+   createdAt: Date
+   updatedAt: Date
+   endTime: LocalTime
+   dayOfWeek: DayOfWeek
+   id: UUID
+   shop: Shop
+   startTime: LocalTime
+}
+class Service {
+   createdAt: Date
+   name: String
+   description: String
+   price: double
+   updatedAt: Date
+   id: UUID
+   duration: int
+   shop: Shop
+}
+class ServiceBuilder
+class Shop {
+   createdAt: Date
+   name: String
+   description: String
+   updatedAt: Date
+   userId: UUID
+   id: UUID
+   openingHours: List<OpeningHours>
+   location: Location
+}
+
+Appointment       "1" *-[#595959,plain]-> "status\n1" AppointmentStatus 
+Appointment       "1" *-[#595959,plain]-> "service\n1" Service           
+Appointment       "1" *-[#595959,plain]-> "shop\n1" Shop              
+Location          "1" *-[#595959,plain]-> "shop\n1" Shop              
+OpeningHours      "1" *-[#595959,plain]-> "shop\n1" Shop              
+Service           "1" *-[#595959,plain]-> "shop\n1" Shop              
+ServiceBuilder     +-[#820000,plain]-  Service           
+Shop              "1" *-[#595959,plain]-> "location\n1" Location          
+Shop              "1" *-[#595959,plain]-> "openingHours\n*" OpeningHours      
+@enduml
