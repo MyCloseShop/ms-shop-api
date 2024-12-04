@@ -1,5 +1,8 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.services.appointment;
 
+import com.etna.gpe.mycloseshop.common_api.ms_login.api.IUserController;
+import com.etna.gpe.mycloseshop.common_api.ms_login.dto.UserDtoWithRoles;
+import com.etna.gpe.mycloseshop.common_api.ms_login.dto.success.ResponseSuccess;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentResponse;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.CreateAppointmentRequest;
@@ -8,16 +11,22 @@ import com.etna.gpe.mycloseshop.ms_shop_api.entity.AppointmentStatus;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.OpeningHours;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Service;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Shop;
+import com.etna.gpe.mycloseshop.ms_shop_api.events.AppointmentCreatedEvent;
 import com.etna.gpe.mycloseshop.ms_shop_api.mappers.IAppointmentMapper;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IAppointmentRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IServiceRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @org.springframework.stereotype.Service
@@ -28,17 +37,25 @@ public class AppointmentServiceImpl implements IAppointmentService {
     private final IShopRepository shopRepository;
     private final IServiceRepository serviceRepository;
     private final IAppointmentMapper appointmentMapper;
+    private final RabbitTemplate rabbitTemplate;
+    // init logger
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
+    private final IUserController userController;
 
     public AppointmentServiceImpl(
             IAppointmentRepository appointmentRepository,
             IShopRepository shopRepository,
             IServiceRepository serviceRepository,
-            IAppointmentMapper appointmentMapper
+            IAppointmentMapper appointmentMapper,
+            RabbitTemplate rabbitTemplate,
+            IUserController userController
     ) {
         this.appointmentRepository = appointmentRepository;
         this.shopRepository = shopRepository;
         this.serviceRepository = serviceRepository;
         this.appointmentMapper = appointmentMapper;
+        this.rabbitTemplate = rabbitTemplate;
+        this.userController = userController;
     }
 
     @Override
@@ -114,9 +131,33 @@ public class AppointmentServiceImpl implements IAppointmentService {
         appointment.setEndTime(endTime);
         appointment.setStatus(AppointmentStatus.PENDING);
 
+        // get user info
+        LOGGER.info("Starting to get user info");
+        ResponseEntity<ResponseSuccess<UserDtoWithRoles>> response = userController.getUserById(request.clientId());
+        UserDtoWithRoles user = Optional.ofNullable(response.getBody())
+                .map(ResponseSuccess::getData).orElseThrow(() -> new NoSuchElementException("User not found"));
+        LOGGER.info("User info fetched: {}", user);
+
         appointment = appointmentRepository.save(appointment);
 
-        // TODO: Send rabbitmq message to notify the shop owner
+        AppointmentCreatedEvent event = AppointmentCreatedEvent.builder()
+                .id(appointment.getId().toString())
+                .shopName(shop.getName())
+                .shopAddress(shop.getLocation().toString())
+                .serviceName(service.getName())
+                .serviceDuration(service.getDuration())
+                .clientEmail(user.getEmail())
+                .clientUsername(user.getUsername())
+                .clientFirstname(user.getFirstName())
+                .clientLastname(user.getLastName())
+                .date(request.date().toString())
+                .startTime(request.startTime().toString())
+                .endTime(endTime.toString())
+                .status(AppointmentStatus.PENDING.name())
+                .build();
+
+        // send message
+        rabbitTemplate.convertAndSend("appointments-exchange", "appointments.created", event);
 
         return new AppointmentResponse(
                 appointment.getId(),

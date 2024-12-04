@@ -1,3 +1,8 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_HOST:http://localhost:8761/eureka/}
+
 logging:
   level:
     org.springframework: DEBUG
@@ -5,6 +10,14 @@ logging:
     com.etna.gpe.mycloseshop.security_api: DEBUG
     slf4j: DEBUG
     org.springframework.security: DEBUG
+
+rabbitmq:
+  exchange:
+    appointments: appointments-exchange
+  queue:
+    appointments:
+      created: appointments-created-queue
+
 server:
   port: ${SPRING_APP_PORT:8082}
   servlet:
@@ -12,6 +25,16 @@ server:
 spring:
   application:
     name: ms-shop-api
+
+  cloud:
+    discovery:
+      enabled: true
+
+  rabbitmq:
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/db-ms-shop?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC}
