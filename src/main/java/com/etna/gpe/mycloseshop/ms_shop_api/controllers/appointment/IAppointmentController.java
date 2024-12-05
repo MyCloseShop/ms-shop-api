@@ -122,4 +122,55 @@ public interface IAppointmentController {
             }
     )
     ResponseEntity<List<AppointmentDto>> getAppointmentsByClientId(@Valid @PathVariable UUID clientId);
+
+    // get client appointments by status
+    @GetMapping(path = "/user/{clientId}/status/{status}")
+    @Operation(summary = "Get appointments", description = "Get appointments for a client by status")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Appointments found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = AppointmentDto.class)
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request"
+                    )
+            }
+    )
+    ResponseEntity<List<AppointmentDto>> getAppointmentsByClientIdAndStatus(
+            @Valid @PathVariable UUID clientId, @Valid @PathVariable String status
+    );
+
+    // get shop appointments by status
+    @GetMapping(path = "/shop/{shopId}/status/{status}")
+    @Operation(summary = "Get appointments", description = "Get appointments for a shop by status")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Appointments found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = AppointmentDto.class)
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request"
+                    )
+            }
+    )
+    ResponseEntity<List<AppointmentDto>> getAppointmentsByShopIdAndStatus(
+            @Valid @PathVariable UUID shopId, @Valid @PathVariable String status
+    );
+
 }

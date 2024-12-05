@@ -21,4 +21,6 @@ public interface IAppointmentRepository extends JpaRepository<Appointment, UUID>
     List<Appointment> findByShop(Shop shop);
 
     List<Appointment> findByUserIdAndStatus(UUID userId, AppointmentStatus status);
+
+    List<Appointment> findByShopAndStatus(Shop shop, AppointmentStatus status);
 }

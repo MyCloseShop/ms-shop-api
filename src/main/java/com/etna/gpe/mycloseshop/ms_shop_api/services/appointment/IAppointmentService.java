@@ -22,4 +22,10 @@ public interface IAppointmentService {
     List<AppointmentDto> getAppointmentsByShopId(UUID shopId);
 
     List<AppointmentDto> getAppointmentsByClientId(UUID clientId);
+
+    Boolean confirmAppointment(UUID appointmentId);
+
+    List<AppointmentDto> getAppointmentsByClientIdAndStatus(UUID clientId, String status);
+
+    List<AppointmentDto> getAppointmentsByShopIdAndStatus(UUID shopId, String status);
 }

@@ -203,4 +203,37 @@ public class AppointmentServiceImpl implements IAppointmentService {
                 startTime.isBefore(appointment.getEndTime()) && endTime.isAfter(appointment.getStartTime())
         );
     }
+
+    public Boolean confirmAppointment(UUID appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new NoSuchElementException("Appointment not found"));
+
+        appointment.setStatus(AppointmentStatus.CONFIRMED);
+        appointmentRepository.save(appointment);
+
+        return true;
+    }
+
+    @Override
+    public List<AppointmentDto> getAppointmentsByClientIdAndStatus(UUID clientId, String status) {
+        AppointmentStatus appointmentStatus = AppointmentStatus.valueOf(status);
+        List<Appointment> appointmentList = appointmentRepository.findByUserIdAndStatus(clientId, appointmentStatus);
+
+        return appointmentList.stream()
+                .map(appointmentMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<AppointmentDto> getAppointmentsByShopIdAndStatus(UUID shopId, String status) {
+        AppointmentStatus appointmentStatus = AppointmentStatus.valueOf(status);
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new NoSuchElementException(SHOP_NOT_FOUND));
+
+        List<Appointment> appointmentList = appointmentRepository.findByShopAndStatus(shop, appointmentStatus);
+
+        return appointmentList.stream()
+                .map(appointmentMapper::toDto)
+                .toList();
+    }
 }

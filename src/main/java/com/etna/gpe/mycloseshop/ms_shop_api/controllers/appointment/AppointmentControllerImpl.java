@@ -41,4 +41,14 @@ public class AppointmentControllerImpl implements IAppointmentController{
     public ResponseEntity<List<AppointmentDto>> getAppointmentsByClientId(UUID clientId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
     }
+
+    @Override
+    public ResponseEntity<List<AppointmentDto>> getAppointmentsByClientIdAndStatus(UUID clientId, String status) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByClientIdAndStatus(clientId, status));
+    }
+
+    @Override
+    public ResponseEntity<List<AppointmentDto>> getAppointmentsByShopIdAndStatus(UUID shopId, String status) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByShopIdAndStatus(shopId, status));
+    }
 }
