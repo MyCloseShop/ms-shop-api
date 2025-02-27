@@ -33,13 +33,13 @@ import java.util.UUID;
 public class AppointmentServiceImpl implements IAppointmentService {
 
     public static final String SHOP_NOT_FOUND = "Shop not found";
+    // init logger
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
     private final IAppointmentRepository appointmentRepository;
     private final IShopRepository shopRepository;
     private final IServiceRepository serviceRepository;
     private final IAppointmentMapper appointmentMapper;
     private final RabbitTemplate rabbitTemplate;
-    // init logger
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
     private final IUserApiFeign userController;
 
     public AppointmentServiceImpl(
@@ -70,21 +70,28 @@ public class AppointmentServiceImpl implements IAppointmentService {
         Shop shop = shopRepository.findById(UUID.fromString(shopId))
                 .orElseThrow(() -> new NoSuchElementException(SHOP_NOT_FOUND));
 
-        OpeningHours openingHours = shop.getOpeningHours()
+        List<OpeningHours> openingHoursList = shop.getOpeningHours()
                 .stream()
                 .filter(oh -> oh.getDayOfWeek().name().equals(date.getDayOfWeek().name()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Shop is closed on this day"));
+                .toList();
 
-        LocalTime startTime = openingHours.getStartTime();
-        LocalTime endTime = openingHours.getEndTime();
+        if (openingHoursList.isEmpty()) {
+            throw new IllegalArgumentException("Shop is closed on this day");
+        }
+
 
         List<Appointment> existingAppointments = appointmentRepository.findByShopAndAppointmentDateAndStatusNot(
                 shop, date, AppointmentStatus.CANCELED
         );
 
+        List<LocalTime> availableSlots = new ArrayList<>();
 
-        return calculateAvailableSlots(startTime, endTime, durationMinutes, existingAppointments);
+        for (OpeningHours openingHours : openingHoursList) {
+            availableSlots.addAll(calculateAvailableSlots(openingHours.getStartTime(), openingHours.getEndTime(), durationMinutes, existingAppointments));
+        }
+
+        return availableSlots;
+
     }
 
     @Override
@@ -134,7 +141,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
         // get user info
         LOGGER.info("Starting to get user info");
         ResponseEntity<ResponseSuccess<UserDtoWithRoles>> response = userController.getUserById(request.clientId());
-        UserDtoWithRoles user = Optional.ofNullable(response.getBody())
+        UserDtoWithRoles user = Optional.ofNullable(response).map(ResponseEntity::getBody)
                 .map(ResponseSuccess::getData).orElseThrow(() -> new NoSuchElementException("User not found"));
         LOGGER.info("User info fetched: {}", user);
 
