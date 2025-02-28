@@ -16,6 +16,7 @@ import com.etna.gpe.mycloseshop.ms_shop_api.mappers.IAppointmentMapper;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IAppointmentRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IServiceRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
+import com.etna.gpe.mycloseshop.ms_shop_api.utils.appointments.ISortedHours;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -41,6 +42,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
     private final IAppointmentMapper appointmentMapper;
     private final RabbitTemplate rabbitTemplate;
     private final IUserApiFeign userController;
+    private final ISortedHours sortedHours;
 
     public AppointmentServiceImpl(
             IAppointmentRepository appointmentRepository,
@@ -48,7 +50,8 @@ public class AppointmentServiceImpl implements IAppointmentService {
             IServiceRepository serviceRepository,
             IAppointmentMapper appointmentMapper,
             RabbitTemplate rabbitTemplate,
-            IUserApiFeign userController
+            IUserApiFeign userController,
+            ISortedHours sortedHours
     ) {
         this.appointmentRepository = appointmentRepository;
         this.shopRepository = shopRepository;
@@ -56,6 +59,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
         this.appointmentMapper = appointmentMapper;
         this.rabbitTemplate = rabbitTemplate;
         this.userController = userController;
+        this.sortedHours = sortedHours;
     }
 
     @Override
@@ -90,7 +94,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
             availableSlots.addAll(calculateAvailableSlots(openingHours.getStartTime(), openingHours.getEndTime(), durationMinutes, existingAppointments));
         }
 
-        return availableSlots;
+        return sortedHours.sortHours(availableSlots);
 
     }
 
