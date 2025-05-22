@@ -16,6 +16,7 @@ public class AppointmentCreatedEvent {
     private String shopName;
     private String shopAddress;
     private String serviceName;
+    private String serviceDescription;
     private Integer serviceDuration;
     private String clientEmail;
     private String clientUsername;

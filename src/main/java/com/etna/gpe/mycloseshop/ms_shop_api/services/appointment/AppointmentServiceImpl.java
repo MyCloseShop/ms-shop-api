@@ -150,12 +150,16 @@ public class AppointmentServiceImpl implements IAppointmentService {
         LOGGER.info("User info fetched: {}", user);
 
         appointment = appointmentRepository.save(appointment);
+        String Address = shop.getLocation().getAddress()
+                + ", " + shop.getLocation().getPostalCode()
+                + " " + shop.getLocation().getCity();
 
         AppointmentCreatedEvent event = AppointmentCreatedEvent.builder()
                 .id(appointment.getId().toString())
                 .shopName(shop.getName())
-                .shopAddress(shop.getLocation().toString())
+                .shopAddress(Address)
                 .serviceName(service.getName())
+                .serviceDescription(service.getDescription())
                 .serviceDuration(service.getDuration())
                 .clientEmail(user.getEmail())
                 .clientUsername(user.getUsername())
