@@ -29,7 +29,7 @@ import java.util.UUID;
 @Tag(name = "Appointment Managment", description = "API for managing appointments")
 @RequestMapping(path = "/appointment")
 public interface IAppointmentController {
-    @GetMapping(path = "/shop/{shopId}/service/{serviceId}")
+    @GetMapping(path = "/shop/{shopId}/duration/{duration}")
     @Operation(summary = "Get available slots", description = "Get available slots for a service in a shop")
     @ApiResponses(
             value = {
@@ -51,7 +51,7 @@ public interface IAppointmentController {
     )
     ResponseEntity<List<LocalTime>> getAvailableSlots(
             @PathVariable String shopId,
-            @PathVariable String serviceId,
+            @PathVariable Integer duration,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     );
 

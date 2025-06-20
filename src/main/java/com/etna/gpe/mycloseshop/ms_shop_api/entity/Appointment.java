@@ -1,7 +1,10 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.entity;
 
+import com.etna.gpe.mycloseshop.ms_shop_api.enums.AppointmentType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +18,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -26,6 +30,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "appointment")
+@Check(constraints = "(" +
+        "type = 'SERVICE' AND service_id IS NOT NULL AND quote_id IS NULL" +
+        ") OR (" +
+        "type = 'DEVIS'   AND quote_id   IS NOT NULL AND service_id IS NULL" +
+        ")")
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,9 +44,16 @@ public class Appointment {
     @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop;
 
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AppointmentType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", nullable = false)
+    @JoinColumn(name = "service_id")
     private Service service;
+
+    @Column(name = "quote_id", columnDefinition = "BINARY(16)", length = 36)
+    private UUID quoteId;
 
     @Column(name = "user_id", nullable = false)
     private UUID userId;
@@ -52,6 +68,7 @@ public class Appointment {
     private LocalTime endTime;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
     @Column(name = "created_at", nullable = false)

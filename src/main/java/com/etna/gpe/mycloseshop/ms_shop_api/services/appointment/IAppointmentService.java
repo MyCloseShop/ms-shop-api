@@ -14,7 +14,7 @@ import java.util.UUID;
 
 
 public interface IAppointmentService {
-    List<LocalTime> getAvailableSlots(String shopId, LocalDate date, String serviceId);
+    List<LocalTime> getAvailableSlots(String shopId, LocalDate date, Integer duration);
 
     List<LocalTime> calculateAvailableSlots(LocalTime startTime, LocalTime endTime, int durationMinutes, List<Appointment> existingAppointments);
 

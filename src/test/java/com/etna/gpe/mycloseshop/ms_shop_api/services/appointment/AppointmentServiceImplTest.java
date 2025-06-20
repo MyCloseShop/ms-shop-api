@@ -81,7 +81,7 @@ class AppointmentServiceImplTest {
                 any(Shop.class), any(LocalDate.class), any(AppointmentStatus.class))
         ).thenReturn(new ArrayList<>());
         // When
-        List<LocalTime> availableSlots = appointmentService.getAvailableSlots(shopId.toString(), givenDate, UUID.randomUUID().toString());
+        List<LocalTime> availableSlots = appointmentService.getAvailableSlots(shopId.toString(), givenDate, 10);
 
         // Then
 
@@ -128,7 +128,7 @@ class AppointmentServiceImplTest {
         ).thenReturn(existingAppointments);
 
         // When
-        List<LocalTime> availableSlots = appointmentService.getAvailableSlots(shopId.toString(), givenDate, UUID.randomUUID().toString());
+        List<LocalTime> availableSlots = appointmentService.getAvailableSlots(shopId.toString(), givenDate, 10);
 
         // Then
         assertThat(availableSlots).isNotNull().isNotEmpty().hasSize(19)
@@ -173,7 +173,7 @@ class AppointmentServiceImplTest {
                 any(Shop.class), any(LocalDate.class), any(AppointmentStatus.class))
         ).thenReturn(new ArrayList<>());
         // When
-        List<LocalTime> availableSlots = appointmentService.getAvailableSlots(shopId.toString(), givenDate, UUID.randomUUID().toString());
+        List<LocalTime> availableSlots = appointmentService.getAvailableSlots(shopId.toString(), givenDate, 10);
 
         // Then
         List<LocalTime> expectedSlots = List.of(

@@ -1,5 +1,6 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment;
 
+import com.etna.gpe.mycloseshop.ms_shop_api.enums.AppointmentType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
@@ -14,6 +15,8 @@ public record CreateAppointmentRequest(
         LocalDate date,
         @JsonProperty("start_time")
         LocalTime startTime,
+        @JsonProperty("appointment_type")
+        AppointmentType appointmentType,
         @JsonProperty("service_id")
         UUID serviceId,
         @JsonProperty("client_id")
