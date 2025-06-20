@@ -1,8 +1,5 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.services.appointment;
 
-import com.etna.gpe.mycloseshop.common_api.ms_login.api.IUserApiFeign;
-import com.etna.gpe.mycloseshop.common_api.ms_login.dto.UserDtoWithRoles;
-import com.etna.gpe.mycloseshop.common_api.ms_login.dto.success.ResponseSuccess;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentResponse;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.CreateAppointmentRequest;
@@ -11,23 +8,20 @@ import com.etna.gpe.mycloseshop.ms_shop_api.entity.AppointmentStatus;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.OpeningHours;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Service;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Shop;
+import com.etna.gpe.mycloseshop.ms_shop_api.enums.AppointmentType;
 import com.etna.gpe.mycloseshop.ms_shop_api.events.AppointmentCreatedEvent;
 import com.etna.gpe.mycloseshop.ms_shop_api.mappers.IAppointmentMapper;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IAppointmentRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IServiceRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.utils.appointments.ISortedHours;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @org.springframework.stereotype.Service
@@ -35,13 +29,11 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
     public static final String SHOP_NOT_FOUND = "Shop not found";
     // init logger
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
     private final IAppointmentRepository appointmentRepository;
     private final IShopRepository shopRepository;
     private final IServiceRepository serviceRepository;
     private final IAppointmentMapper appointmentMapper;
     private final RabbitTemplate rabbitTemplate;
-    private final IUserApiFeign userController;
     private final ISortedHours sortedHours;
 
     public AppointmentServiceImpl(
@@ -50,7 +42,6 @@ public class AppointmentServiceImpl implements IAppointmentService {
             IServiceRepository serviceRepository,
             IAppointmentMapper appointmentMapper,
             RabbitTemplate rabbitTemplate,
-            IUserApiFeign userController,
             ISortedHours sortedHours
     ) {
         this.appointmentRepository = appointmentRepository;
@@ -58,19 +49,11 @@ public class AppointmentServiceImpl implements IAppointmentService {
         this.serviceRepository = serviceRepository;
         this.appointmentMapper = appointmentMapper;
         this.rabbitTemplate = rabbitTemplate;
-        this.userController = userController;
         this.sortedHours = sortedHours;
     }
 
     @Override
-    public List<LocalTime> getAvailableSlots(String shopId, LocalDate date, String serviceId) {
-
-        Service service = serviceRepository.findById(UUID.fromString(serviceId))
-                .orElseThrow(() -> new NoSuchElementException("Service not found"));
-
-        int durationMinutes = service.getDuration();
-
-
+    public List<LocalTime> getAvailableSlots(String shopId, LocalDate date, Integer duration) {
         Shop shop = shopRepository.findById(UUID.fromString(shopId))
                 .orElseThrow(() -> new NoSuchElementException(SHOP_NOT_FOUND));
 
@@ -91,7 +74,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
         List<LocalTime> availableSlots = new ArrayList<>();
 
         for (OpeningHours openingHours : openingHoursList) {
-            availableSlots.addAll(calculateAvailableSlots(openingHours.getStartTime(), openingHours.getEndTime(), durationMinutes, existingAppointments));
+            availableSlots.addAll(calculateAvailableSlots(openingHours.getStartTime(), openingHours.getEndTime(), duration, existingAppointments));
         }
 
         return sortedHours.sortHours(availableSlots);
@@ -120,64 +103,108 @@ public class AppointmentServiceImpl implements IAppointmentService {
         return availableSlots;
     }
 
+    @Override
     public AppointmentResponse createAppointment(CreateAppointmentRequest request) {
+        // 1. Récupérer le magasin
         Shop shop = shopRepository.findById(request.shopId())
                 .orElseThrow(() -> new NoSuchElementException(SHOP_NOT_FOUND));
-        Service service = serviceRepository.findById(request.serviceId())
-                .orElseThrow(() -> new NoSuchElementException("Service not found"));
 
-        LocalTime endTime = request.startTime().plusMinutes(service.getDuration());
+        Service service = null;
+        UUID quoteId = null;
+        LocalTime endTime;
 
+        // 2. Traiter selon le type de rendez-vous
+        switch (request.appointmentType()) {
+            case SERVICE -> {
+                // Validation pour le type SERVICE
+                if (request.serviceId() == null) {
+                    throw new IllegalArgumentException("Service ID is required for service appointment");
+                }
+
+                // Récupérer le service
+                service = serviceRepository.findById(request.serviceId())
+                        .orElseThrow(() -> new NoSuchElementException("Service not found"));
+
+                // Calculer l'heure de fin basée sur la durée du service
+                endTime = request.startTime().plusMinutes(service.getDuration());
+            }
+            case QUOTE -> {
+                // Validation pour le type QUOTE
+                if (request.serviceId() == null) {
+                    throw new IllegalArgumentException("Quote ID is required for quote appointment");
+                }
+
+                // Stocker l'ID du devis
+                quoteId = request.serviceId();
+
+                // Pour un devis, on définit une durée standard (par exemple 30 minutes)
+                // Cette durée pourrait venir d'une configuration ou d'une constante
+
+                if (request.duration() == null || request.duration() <= 0) {
+                    throw new IllegalArgumentException("Duration must be a positive integer for quote appointment");
+                }
+
+                endTime = request.startTime().plusMinutes(request.duration());
+            }
+            default -> throw new IllegalArgumentException("Invalid appointment type");
+        }
+
+        // 3. Vérifier la disponibilité du créneau
         boolean isSlotAvailable = isSlotAvailable(shop, request.date(), request.startTime(), endTime);
         if (!isSlotAvailable) {
             throw new IllegalArgumentException("The requested slot is already booked");
         }
 
+        // 4. Créer et sauvegarder le rendez-vous
         Appointment appointment = new Appointment();
         appointment.setShop(shop);
-        appointment.setService(service);
+        appointment.setType(request.appointmentType());
+        appointment.setService(AppointmentType.SERVICE.equals(request.appointmentType()) ? service : null); // Null pour QUOTE
+        appointment.setQuoteId(AppointmentType.QUOTE.equals(request.appointmentType()) ? quoteId : null);
         appointment.setUserId(request.clientId());
         appointment.setAppointmentDate(request.date());
         appointment.setStartTime(request.startTime());
         appointment.setEndTime(endTime);
         appointment.setStatus(AppointmentStatus.PENDING);
 
-        // get user info
-        LOGGER.info("Starting to get user info");
-        ResponseEntity<ResponseSuccess<UserDtoWithRoles>> response = userController.getUserById(request.clientId());
-        UserDtoWithRoles user = Optional.ofNullable(response).map(ResponseEntity::getBody)
-                .map(ResponseSuccess::getData).orElseThrow(() -> new NoSuchElementException("User not found"));
-        LOGGER.info("User info fetched: {}", user);
-
         appointment = appointmentRepository.save(appointment);
+
         String Address = shop.getLocation().getAddress()
                 + ", " + shop.getLocation().getPostalCode()
                 + " " + shop.getLocation().getCity();
 
-        AppointmentCreatedEvent event = AppointmentCreatedEvent.builder()
+        // 5. Créer et envoyer l'événement
+        AppointmentCreatedEvent.AppointmentCreatedEventBuilder eventBuilder = AppointmentCreatedEvent.builder()
                 .id(appointment.getId().toString())
                 .shopName(shop.getName())
                 .shopAddress(Address)
-                .serviceName(service.getName())
-                .serviceDescription(service.getDescription())
-                .serviceDuration(service.getDuration())
-                .clientEmail(user.getEmail())
-                .clientUsername(user.getUsername())
-                .clientFirstname(user.getFirstName())
-                .clientLastname(user.getLastName())
+                .clientId(appointment.getUserId().toString())
                 .date(request.date().toString())
                 .startTime(request.startTime().toString())
                 .endTime(endTime.toString())
-                .status(AppointmentStatus.PENDING.name())
-                .build();
+                .status(AppointmentStatus.PENDING.name());
 
-        // send message
+        // Ajouter les informations spécifiques selon le type
+        if (service != null) {
+            eventBuilder
+                    .serviceName(service.getName())
+                    .serviceDuration(service.getDuration())
+                    .serviceDescription(service.getDescription());
+        }
+        /*else if (quoteId != null) {
+            eventBuilder.quoteId(quoteId.toString());
+        }*/
+
+        AppointmentCreatedEvent event = eventBuilder.build();
+
+        // Envoyer le message
         rabbitTemplate.convertAndSend("appointments-exchange", "appointments.created", event);
 
+        // 6. Retourner la réponse
         return new AppointmentResponse(
                 appointment.getId(),
                 shop.getId(),
-                service.getId(),
+                service != null ? service.getId() : null,
                 appointment.getUserId(),
                 appointment.getAppointmentDate(),
                 appointment.getStartTime(),

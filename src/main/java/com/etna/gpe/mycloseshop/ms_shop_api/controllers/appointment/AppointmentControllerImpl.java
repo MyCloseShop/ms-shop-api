@@ -23,8 +23,8 @@ public class AppointmentControllerImpl implements IAppointmentController{
     }
 
     @Override
-    public ResponseEntity<List<LocalTime>> getAvailableSlots(String shopId, String serviceId, LocalDate date) {
-        return ResponseEntity.ok(appointmentService.getAvailableSlots(shopId, date, serviceId));
+    public ResponseEntity<List<LocalTime>> getAvailableSlots(String shopId, Integer duration, LocalDate date) {
+        return ResponseEntity.ok(appointmentService.getAvailableSlots(shopId, date, duration));
     }
 
     @Override
