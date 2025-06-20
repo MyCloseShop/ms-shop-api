@@ -15,8 +15,6 @@ import com.etna.gpe.mycloseshop.ms_shop_api.repository.IAppointmentRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IServiceRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.utils.appointments.ISortedHours;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.LocalDate;
@@ -31,7 +29,6 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
     public static final String SHOP_NOT_FOUND = "Shop not found";
     // init logger
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
     private final IAppointmentRepository appointmentRepository;
     private final IShopRepository shopRepository;
     private final IServiceRepository serviceRepository;
@@ -142,8 +139,12 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
                 // Pour un devis, on définit une durée standard (par exemple 30 minutes)
                 // Cette durée pourrait venir d'une configuration ou d'une constante
-                int quoteDurationMinutes = 30; // Durée standard pour un devis
-                endTime = request.startTime().plusMinutes(quoteDurationMinutes);
+
+                if (request.duration() == null || request.duration() <= 0) {
+                    throw new IllegalArgumentException("Duration must be a positive integer for quote appointment");
+                }
+
+                endTime = request.startTime().plusMinutes(request.duration());
             }
             default -> throw new IllegalArgumentException("Invalid appointment type");
         }
