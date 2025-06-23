@@ -201,16 +201,16 @@ public class AppointmentServiceImpl implements IAppointmentService {
         rabbitTemplate.convertAndSend("appointments-exchange", "appointments.created", event);
 
         // 6. Retourner la réponse
-        return new AppointmentResponse(
-                appointment.getId(),
-                shop.getId(),
-                service != null ? service.getId() : null,
-                appointment.getUserId(),
-                appointment.getAppointmentDate(),
-                appointment.getStartTime(),
-                appointment.getEndTime(),
-                appointment.getStatus()
-        );
+        return AppointmentResponse.builder()
+                .appointmentId(appointment.getId())
+                .shopId(shop.getId())
+                .serviceId(service != null ? service.getId() : quoteId)
+                .clientId(appointment.getUserId())
+                .date(request.date())
+                .startTime(request.startTime())
+                .endTime(endTime)
+                .status(appointment.getStatus())
+                .build();
     }
 
     @Override
