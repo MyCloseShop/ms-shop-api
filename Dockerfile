@@ -90,9 +90,3 @@ COPY --from=extract build/target/extracted/application/ ./
 EXPOSE 8080
 
 ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
-
-FROM eclipse-temurin:21-jre-jammy AS executable
-WORKDIR /app
-COPY target/app.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]

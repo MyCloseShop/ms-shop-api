@@ -10,11 +10,11 @@ VERSION=$1
 IMAGE_NAME="redsnoww/ms-shop-api"
 
 # Build et push pour AMD
-docker buildx build --platform linux/amd64 -t ${IMAGE_NAME}:${VERSION}-amd --target executable .
+docker buildx build --platform linux/amd64 -t ${IMAGE_NAME}:${VERSION}-amd .
 docker push ${IMAGE_NAME}:${VERSION}-amd
 
 # Build et push pour ARM
-docker buildx build --platform linux/arm64 -t ${IMAGE_NAME}:${VERSION}-arm --target executable .
+docker buildx build --platform linux/arm64 -t ${IMAGE_NAME}:${VERSION}-arm .
 docker push ${IMAGE_NAME}:${VERSION}-arm
 
 # Créer et push le manifest
