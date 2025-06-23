@@ -159,7 +159,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
         Appointment appointment = new Appointment();
         appointment.setShop(shop);
         appointment.setType(request.appointmentType());
-        appointment.setService(AppointmentType.SERVICE.equals(request.appointmentType()) ? service : null); // Null pour QUOTE
+        appointment.setService(AppointmentType.SERVICE.equals(request.appointmentType()) ? service : null);
         appointment.setQuoteId(AppointmentType.QUOTE.equals(request.appointmentType()) ? quoteId : null);
         appointment.setUserId(request.clientId());
         appointment.setAppointmentDate(request.date());

@@ -33,7 +33,7 @@ import java.util.UUID;
 @Check(constraints = "(" +
         "type = 'SERVICE' AND service_id IS NOT NULL AND quote_id IS NULL" +
         ") OR (" +
-        "type = 'DEVIS'   AND quote_id   IS NOT NULL AND service_id IS NULL" +
+        "type = 'QUOTE'   AND quote_id   IS NOT NULL AND service_id IS NULL" +
         ")")
 public class Appointment {
     @Id
