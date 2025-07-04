@@ -1,7 +1,6 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.services.appointment;
 
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentResponse;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.CreateAppointmentRequest;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Appointment;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.AppointmentStatus;
@@ -104,7 +103,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
     }
 
     @Override
-    public AppointmentResponse createAppointment(CreateAppointmentRequest request) {
+    public AppointmentDto createAppointment(CreateAppointmentRequest request) {
         // 1. Récupérer le magasin
         Shop shop = shopRepository.findById(request.shopId())
                 .orElseThrow(() -> new NoSuchElementException(SHOP_NOT_FOUND));
@@ -201,16 +200,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
         rabbitTemplate.convertAndSend("appointments-exchange", "appointments.created", event);
 
         // 6. Retourner la réponse
-        return AppointmentResponse.builder()
-                .appointmentId(appointment.getId())
-                .shopId(shop.getId())
-                .serviceId(service != null ? service.getId() : quoteId)
-                .clientId(appointment.getUserId())
-                .date(request.date())
-                .startTime(request.startTime())
-                .endTime(endTime)
-                .status(appointment.getStatus())
-                .build();
+        return appointmentMapper.toDto(appointment);
     }
 
     @Override

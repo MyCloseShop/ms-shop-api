@@ -1,6 +1,5 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment;
 
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.service.ServiceDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.AppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +13,8 @@ import java.util.UUID;
 public record AppointmentDto(
         UUID id,
         ShopDto shop,
-        ServiceDto service,
+        @JsonProperty("service_id")
+        UUID serviceId,
         UUID clientId,
         LocalDate date,
         @JsonProperty("start_time")

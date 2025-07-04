@@ -1,7 +1,6 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.controllers.appointment;
 
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentDto;
-import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.AppointmentResponse;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.appointment.CreateAppointmentRequest;
 import com.etna.gpe.mycloseshop.ms_shop_api.services.appointment.IAppointmentService;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class AppointmentControllerImpl implements IAppointmentController{
     }
 
     @Override
-    public ResponseEntity<AppointmentResponse> bookAppointment(CreateAppointmentRequest request) {
+    public ResponseEntity<AppointmentDto> bookAppointment(CreateAppointmentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(request));
     }
 
