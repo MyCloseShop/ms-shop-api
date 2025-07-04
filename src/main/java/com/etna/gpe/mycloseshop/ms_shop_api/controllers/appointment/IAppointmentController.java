@@ -64,7 +64,7 @@ public interface IAppointmentController {
                             description = "Appointment booked",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = AppointmentResponse.class)
+                                    schema = @Schema(implementation = AppointmentDto.class)
                             )
                     ),
                     @ApiResponse(
@@ -77,7 +77,7 @@ public interface IAppointmentController {
                     )
             }
     )
-    ResponseEntity<AppointmentResponse> bookAppointment(@Valid @RequestBody CreateAppointmentRequest request);
+    ResponseEntity<AppointmentDto> bookAppointment(@Valid @RequestBody CreateAppointmentRequest request);
 
     @GetMapping(path = "/shop/{shopId}")
     @Operation(summary = "Get appointments", description = "Get appointments for a shop")
