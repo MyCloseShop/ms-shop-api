@@ -75,6 +75,7 @@ class IAppointmentMapperTest {
 
         // Then
         assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.SERVICE);
         assertThat(result.serviceId()).isEqualTo(testService.getId());
         assertThat(result.id()).isEqualTo(appointment.getId());
         assertThat(result.clientId()).isEqualTo(appointment.getUserId());
@@ -92,7 +93,7 @@ class IAppointmentMapperTest {
     }
 
     @Test
-    @DisplayName("Should map serviceId from quoteId when service is null")
+    @DisplayName("Should map serviceId from quoteId when appointment type is QUOTE")
     void testToDto_WithQuoteId_ShouldReturnQuoteId() {
         // Given
         UUID quoteId = UUID.randomUUID();
@@ -106,6 +107,7 @@ class IAppointmentMapperTest {
 
         // Then
         assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.QUOTE);
         assertThat(result.serviceId()).isEqualTo(quoteId);
         assertThat(result.id()).isEqualTo(appointment.getId());
         assertThat(result.clientId()).isEqualTo(appointment.getUserId());
@@ -134,6 +136,7 @@ class IAppointmentMapperTest {
 
         // Then
         assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.QUOTE);
         assertThat(result.serviceId()).isEqualTo(quoteId);
     }
 
@@ -142,6 +145,7 @@ class IAppointmentMapperTest {
     void testToDto_WithBothNull_ShouldReturnNullServiceId() {
         // Given
         Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.SERVICE); // Même si c'est SERVICE, pas de service défini
         appointment.setService(null);
         appointment.setQuoteId(null);
 
@@ -150,11 +154,12 @@ class IAppointmentMapperTest {
 
         // Then
         assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.SERVICE);
         assertThat(result.serviceId()).isNull();
     }
 
     @Test
-    @DisplayName("Should prioritize service.id over quoteId when both exist")
+    @DisplayName("Should prioritize service.id over quoteId when both exist and type is SERVICE")
     void testToDto_WithBothServiceAndQuote_ShouldPrioritizeServiceId() {
         // Given
         UUID quoteId = UUID.randomUUID();
@@ -168,8 +173,66 @@ class IAppointmentMapperTest {
 
         // Then
         assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.SERVICE);
         assertThat(result.serviceId()).isEqualTo(testService.getId());
         assertThat(result.serviceId()).isNotEqualTo(quoteId);
+    }
+
+    @Test
+    @DisplayName("Should map QUOTE type correctly and use quoteId even when service exists")
+    void testToDto_WithQuoteTypeAndServicePresent_ShouldUseQuoteId() {
+        // Given
+        UUID quoteId = UUID.randomUUID();
+        Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.QUOTE);
+        appointment.setService(testService); // Service présent mais ignoré car type = QUOTE
+        appointment.setQuoteId(quoteId);
+
+        // When
+        AppointmentDto result = mapper.toDto(appointment);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.QUOTE);
+        // Maintenant avec la nouvelle logique, on utilise quoteId pour les types QUOTE
+        assertThat(result.serviceId()).isEqualTo(quoteId);
+        assertThat(result.serviceId()).isNotEqualTo(testService.getId());
+    }
+
+    @Test
+    @DisplayName("Should return null for SERVICE type when service is null")
+    void testToDto_WithServiceTypeButNoService_ShouldReturnNull() {
+        // Given
+        Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.SERVICE);
+        appointment.setService(null);
+        appointment.setQuoteId(UUID.randomUUID()); // QuoteId présent mais ignoré car type = SERVICE
+
+        // When
+        AppointmentDto result = mapper.toDto(appointment);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.SERVICE);
+        assertThat(result.serviceId()).isNull(); // Pas de service.id disponible
+    }
+
+    @Test
+    @DisplayName("Should return null for QUOTE type when quoteId is null")
+    void testToDto_WithQuoteTypeButNoQuoteId_ShouldReturnNull() {
+        // Given
+        Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.QUOTE);
+        appointment.setService(testService); // Service présent mais ignoré car type = QUOTE
+        appointment.setQuoteId(null);
+
+        // When
+        AppointmentDto result = mapper.toDto(appointment);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.appointmentType()).isEqualTo(AppointmentType.QUOTE);
+        assertThat(result.serviceId()).isNull(); // Pas de quoteId disponible
     }
 
     @Test
@@ -178,6 +241,7 @@ class IAppointmentMapperTest {
         // Given
         testShop.setOpeningHours(List.of());
         Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.SERVICE); // Ajouter le type obligatoire
         appointment.setService(testService);
 
         // When
@@ -194,6 +258,7 @@ class IAppointmentMapperTest {
         // Given
         testShop.setOpeningHours(null);
         Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.SERVICE); // Ajouter le type obligatoire
         appointment.setService(testService);
 
         // When
@@ -217,6 +282,7 @@ class IAppointmentMapperTest {
         testShop.setOpeningHours(List.of(testOpeningHours, secondOpeningHours));
 
         Appointment appointment = createBaseAppointment();
+        appointment.setType(AppointmentType.SERVICE); // Ajouter le type obligatoire
         appointment.setService(testService);
 
         // When
