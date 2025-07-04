@@ -19,6 +19,7 @@ public interface IAppointmentMapper {
     @Mapping(target = "shop.ownerId", source = "shop.userId")
     @Mapping(target = "shop.locationId", source = "shop.location.id")
     @Mapping(target = "shop.openingHoursIds", source = "shop.openingHours")
+    @Mapping(target = "appointmentType", source = "type")
     @Mapping(target = "serviceId", ignore = true)
     @Mapping(target = "clientId", source = "userId")
     @Mapping(target = "date", source = "appointmentDate")
@@ -27,11 +28,24 @@ public interface IAppointmentMapper {
     @AfterMapping
     default void mapServiceId(@MappingTarget AppointmentDto.AppointmentDtoBuilder builder, Appointment appointment) {
         UUID serviceId;
-        if (appointment.getService() != null && appointment.getService().getId() != null) {
-            serviceId = appointment.getService().getId();
-        } else {
-            serviceId = appointment.getQuoteId();
+
+        // Logique basée sur le type de rendez-vous
+        switch (appointment.getType()) {
+            case SERVICE -> {
+                // Pour les rendez-vous de type SERVICE, on utilise service.id
+                if (appointment.getService() != null && appointment.getService().getId() != null) {
+                    serviceId = appointment.getService().getId();
+                } else {
+                    serviceId = null; // Cohérent avec les contraintes DB
+                }
+            }
+            case QUOTE -> {
+                // Pour les rendez-vous de type QUOTE, on utilise quoteId
+                serviceId = appointment.getQuoteId();
+            }
+            default -> serviceId = null;
         }
+
         builder.serviceId(serviceId);
     }
 
