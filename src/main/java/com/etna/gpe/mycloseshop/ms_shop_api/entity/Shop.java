@@ -35,6 +35,10 @@ public class Shop {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    // Champ pour Stripe Connect - ID du compte Stripe connecté du shop
+    @Column(name = "stripe_account_id")
+    private String stripeAccountId;
+
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OpeningHours> openingHours;
 
@@ -76,6 +80,10 @@ public class Shop {
         this.userId = userId;
     }
 
+    public void setStripeAccountId(String stripeAccountId) {
+        this.stripeAccountId = stripeAccountId;
+    }
+
     public void setOpeningHours(List<OpeningHours> openingHours) {
         this.openingHours = openingHours;
     }
@@ -106,6 +114,10 @@ public class Shop {
 
     public UUID getUserId() {
         return userId;
+    }
+
+    public String getStripeAccountId() {
+        return stripeAccountId;
     }
 
     public List<OpeningHours> getOpeningHours() {

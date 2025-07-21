@@ -6,6 +6,7 @@ import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreateShopWithLocationAndOpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreatedShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.UpdateStripeAccountDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -179,4 +181,64 @@ public interface IShopController {
             String shopId
     );
 
+    @GetMapping(path = "/{shopId}/stripe-account")
+    @Operation(summary = "Get Stripe account ID of a shop", description = "Get the Stripe Connect account ID of a shop for payment processing")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Stripe account ID found",
+                            content = @Content(
+                                    schema = @Schema(type = "object", example = "{\"stripeAccountId\": \"acct_1234567890\"}")
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Shop not found or no Stripe account configured",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    )
+            }
+    )
+    ResponseEntity<String> getShopStripeAccountId(
+            @Parameter(description = "Shop id", required = true)
+            @PathVariable("shopId")
+            String shopId
+    );
+
+    @PutMapping(path = "/{shopId}/stripe-account")
+    @Operation(summary = "Update Stripe account ID of a shop", description = "Update the Stripe Connect account ID of a shop for payment processing")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Stripe account ID updated successfully",
+                            content = @Content(
+                                    schema = @Schema(type = "object", example = "{\"message\": \"Stripe account updated successfully\"}")
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Shop not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid Stripe account ID",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    )
+            }
+    )
+    ResponseEntity<String> updateShopStripeAccountId(
+            @Parameter(description = "Shop id", required = true)
+            @PathVariable("shopId")
+            String shopId,
+            @Parameter(description = "Stripe account ID", required = true)
+            @RequestBody UpdateStripeAccountDto stripeAccountDto
+    );
 }
