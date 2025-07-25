@@ -194,10 +194,11 @@ public class AppointmentServiceImpl implements IAppointmentService {
             eventBuilder.quoteId(quoteId.toString());
         }*/
 
-        AppointmentCreatedEvent event = eventBuilder.build();
+        //AppointmentCreatedEvent event = eventBuilder.build();
 
         // Envoyer le message
-        rabbitTemplate.convertAndSend("appointments-exchange", "appointments.created", event);
+        // NOTE: Now once the appointment is created, in base, the confirmation is done when the appiontment is paid
+        //rabbitTemplate.convertAndSend("appointments-exchange", "appointments.created", event);
 
         // 6. Retourner la réponse
         return appointmentMapper.toDto(appointment);
