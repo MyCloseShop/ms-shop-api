@@ -14,6 +14,7 @@ import com.etna.gpe.mycloseshop.ms_shop_api.repository.IAppointmentRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IServiceRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.repository.IShopRepository;
 import com.etna.gpe.mycloseshop.ms_shop_api.utils.appointments.ISortedHours;
+import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.LocalDate;
@@ -235,6 +236,62 @@ public class AppointmentServiceImpl implements IAppointmentService {
         return existingAppointments.stream().noneMatch(appointment ->
                 startTime.isBefore(appointment.getEndTime()) && endTime.isAfter(appointment.getStartTime())
         );
+    }
+
+    @Transactional
+    public Boolean paidAppointment(UUID appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new NoSuchElementException("Appointment not found"));
+        // Check if the appointment is already confirmed
+        if (appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+            throw new IllegalStateException("Appointment is already confirmed");
+        }
+        // Check if the appointment is canceled
+        if (appointment.getStatus() == AppointmentStatus.CANCELED) {
+            throw new IllegalStateException("Appointment is canceled and cannot be paid");
+        }
+        // Check if the appointment is already paid
+        if (appointment.getStatus() == AppointmentStatus.PAID) {
+            throw new IllegalStateException("Appointment is already paid");
+        }
+
+        // Update the appointment status to PAID
+        appointment.setStatus(AppointmentStatus.PAID);
+        appointmentRepository.save(appointment);
+
+        // Publish the event to RabbitMQ
+        AppointmentCreatedEvent event = AppointmentCreatedEvent.builder()
+                .id(appointment.getId().toString())
+                .shopName(appointment.getShop().getName())
+                .shopAddress(appointment.getShop().getLocation().getAddress()
+                        + ", " + appointment.getShop().getLocation().getPostalCode()
+                        + " " + appointment.getShop().getLocation().getCity())
+                .clientId(appointment.getUserId().toString())
+                .date(appointment.getAppointmentDate().toString())
+                .startTime(appointment.getStartTime().toString())
+                .endTime(appointment.getEndTime().toString())
+                .status(AppointmentStatus.PAID.name())
+                .build();
+
+        // if appointment type is SERVICE, add service details
+        if (appointment.getType() == AppointmentType.SERVICE && appointment.getService() != null) {
+            event = event.toBuilder()
+                    .serviceId(appointment.getService().getId().toString())
+                    .serviceName(appointment.getService().getName())
+                    .serviceDuration(appointment.getService().getDuration())
+                    .serviceDescription(appointment.getService().getDescription())
+                    .build();
+        }
+
+        // if appointment type is QUOTE, add quote details
+        if (appointment.getType() == AppointmentType.QUOTE && appointment.getQuoteId() != null) {
+            event = event.toBuilder()
+                    .quoteId(appointment.getQuoteId().toString())
+                    .build();
+        }
+
+        rabbitTemplate.convertAndSend("appointments-exchange", "appointments.paid", event);
+        return true;
     }
 
     public Boolean confirmAppointment(UUID appointmentId) {

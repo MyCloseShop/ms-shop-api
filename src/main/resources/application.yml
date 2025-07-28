@@ -12,6 +12,7 @@ rabbitmq:
   queue:
     appointments:
       created: appointments-created-queue
+      paid: appointments-paid-queue
 
 server:
   port: ${SPRING_APP_PORT:8082}

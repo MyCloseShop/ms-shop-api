@@ -50,4 +50,10 @@ public class AppointmentControllerImpl implements IAppointmentController{
     public ResponseEntity<List<AppointmentDto>> getAppointmentsByShopIdAndStatus(UUID shopId, String status) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByShopIdAndStatus(shopId, status));
     }
+
+    @Override
+    public ResponseEntity<Boolean> paidAppointment(UUID appointmentId) {
+        Boolean result = appointmentService.paidAppointment(appointmentId);
+        return ResponseEntity.ok(result);
+    }
 }

@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -172,5 +173,30 @@ public interface IAppointmentController {
     ResponseEntity<List<AppointmentDto>> getAppointmentsByShopIdAndStatus(
             @Valid @PathVariable UUID shopId, @Valid @PathVariable String status
     );
+
+    // Paid appointment status
+    @PatchMapping(path = "/paid/{appointmentId}")
+    @Operation(summary = "Mark appointment as paid", description = "Mark an appointment as paid")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Appointment marked as paid",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = Boolean.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ResponseError.class)
+                            )
+                    )
+            }
+    )
+    ResponseEntity<Boolean> paidAppointment(@Valid @PathVariable UUID appointmentId);
 
 }
