@@ -2,21 +2,53 @@
 
 ## Description
 
-`mvn clean && install`
+A microservice for handling e-commerce operations built with Jakarta EE and Spring Framework. This service manages
+product catalog, inventory, orders, and transactions.
 
-```yaml
-datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/db-ms-commerce?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC}
-    username: ${SPRING_DATASOURCE_USERNAME:user}
-    password: ${SPRING_DATASOURCE_PASSWORD:secret}
-```
+## Technologies & Dependencies
 
-Ensuite `docker compose up -d db-ms-commerce`
+- Jakarta EE
+- Spring Boot
+- Spring Data JPA
+- Spring MVC
+- Lombok
+- PostgreSQL
+- Maven
 
-Ensuite pour run le projet, juste lancé l'app, si besoin changé dans le `resources/application.yml` les urls et port pour la
-connection à la base de données lancé depuis docker.
+## Setup & Running
 
-À changé si besoin avant de lancé l'app:
+1. Ensure you have JDK 17+ installed
+2. Install PostgreSQL and create a database
+3. Configure database properties in `application.properties`
+4. Build the project: `mvn clean install`
+5. Run the application: `mvn spring-boot:run`
 
+## API Documentation
 
-En plus vérifier si la base est bien créé sur le container... 😉 
+### Products
+
+- GET `/api/v1/products` - List all products
+- GET `/api/v1/products/{id}` - Get product by ID
+- POST `/api/v1/products` - Create new product
+- PUT `/api/v1/products/{id}` - Update product
+- DELETE `/api/v1/products/{id}` - Delete product
+
+### Orders
+
+- GET `/api/v1/orders` - List all orders
+- GET `/api/v1/orders/{id}` - Get order by ID
+- POST `/api/v1/orders` - Create new order
+- PUT `/api/v1/orders/{id}` - Update order status
+
+## Database Schema
+
+The service uses PostgreSQL with the following main entities:
+
+- Products
+- Orders
+- Customers
+- Transactions
+
+## Contributing
+
+Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
