@@ -23,6 +23,8 @@ public interface IAppointmentService {
 
     List<AppointmentDto> getAppointmentsByClientId(UUID clientId);
 
+    Boolean paidAppointment(UUID appointmentId);
+
     Boolean confirmAppointment(UUID appointmentId);
 
     List<AppointmentDto> getAppointmentsByClientIdAndStatus(UUID clientId, String status);

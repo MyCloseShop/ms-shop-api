@@ -5,6 +5,7 @@ import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreateShopWithLocationAndOpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreatedShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.UpdateStripeAccountDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Location;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.OpeningHours;
 import com.etna.gpe.mycloseshop.ms_shop_api.entity.Shop;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
 
 @Service
 public class ShopService implements IShopService {
+    public static final String UPDATED_STRIPE_ACCOUNT_ID_FOR_SHOP = "Updated Stripe account ID for shop: ";
     private final IShopRepository shopRepository;
     private final Logger logger = Logger.getLogger(ShopService.class.getName());
     private final IOpeningHoursMapper openingHoursMapper;
@@ -139,5 +141,43 @@ public class ShopService implements IShopService {
     public LocationDto getShopLocation(String shopId) {
         Shop shop = shopRepository.findById(UUID.fromString(shopId)).orElseThrow();
         return locationMapper.toDto(shop.getLocation());
+    }
+
+    @Override
+    public String getShopStripeAccountId(String shopId) {
+        UUID uuid = UUID.fromString(shopId);
+        Shop shop = shopRepository.findById(uuid)
+                .orElseThrow(() -> new RuntimeException("Shop not found with id: " + shopId));
+
+        String stripeAccountId = shop.getStripeAccountId();
+        if (stripeAccountId == null || stripeAccountId.isEmpty()) {
+            throw new RuntimeException("No Stripe account configured for shop: " + shopId);
+        }
+
+        return stripeAccountId;
+    }
+    
+    @Override
+    public String updateShopStripeAccountId(String shopId, UpdateStripeAccountDto stripeAccountDto) {
+        try {
+            UUID uuid = UUID.fromString(shopId);
+            Shop shop = shopRepository.findById(uuid)
+                    .orElseThrow(() -> new RuntimeException("Shop not found with id: " + shopId));
+            
+            String stripeAccountId = stripeAccountDto.getStripeAccountId();
+            if (stripeAccountId == null || stripeAccountId.isEmpty()) {
+                logger.warning("Invalid shop ID or Stripe account ID");
+                throw new IllegalArgumentException("Stripe account ID cannot be empty");
+            }
+            
+            shop.setStripeAccountId(stripeAccountId);
+            shopRepository.save(shop);
+            
+            logger.info(UPDATED_STRIPE_ACCOUNT_ID_FOR_SHOP + shopId);
+            return "{\"message\": \"Stripe account updated successfully\"}";
+        } catch (Exception e) {
+            logger.severe("Error updating Stripe account ID: " + e.getMessage());
+            throw new RuntimeException("Error updating Stripe account ID", e);
+        }
     }
 }

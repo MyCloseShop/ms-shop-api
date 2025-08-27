@@ -18,6 +18,9 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.queue.appointments.created}")
     private String appointmentCreatedQueue;
 
+    @Value("${rabbitmq.queue.appointments.paid}")
+    private String appointmentPaidQueue;
+
     @Bean
     public TopicExchange appointmentExchange() {
         return new TopicExchange(appointmentsExchange);
@@ -29,8 +32,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue appointmentPaidQueue() {
+        return new Queue(appointmentPaidQueue);
+    }
+
+    @Bean
     public Binding bindAppointmentCreatedQueue(TopicExchange exchange, Queue appointmentCreatedQueue) {
         return BindingBuilder.bind(appointmentCreatedQueue).to(exchange).with("appointments.created");
+    }
+
+    @Bean
+    public Binding bindAppointmentPaidQueue(TopicExchange exchange, Queue appointmentPaidQueue) {
+        return BindingBuilder.bind(appointmentPaidQueue).to(exchange).with("appointments.paid");
     }
 
     @Bean

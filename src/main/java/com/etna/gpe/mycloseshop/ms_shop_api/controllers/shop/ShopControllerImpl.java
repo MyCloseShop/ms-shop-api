@@ -5,6 +5,7 @@ import com.etna.gpe.mycloseshop.ms_shop_api.dtos.opening_hours.OpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreateShopWithLocationAndOpeningHoursDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.CreatedShopDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.ShopDto;
+import com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop.UpdateStripeAccountDto;
 import com.etna.gpe.mycloseshop.ms_shop_api.services.shop.IShopService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +44,17 @@ public class ShopControllerImpl implements IShopController {
     @Override
     public ResponseEntity<LocationDto> getShopLocation(String shopId) {
         return ResponseEntity.status(HttpStatus.OK).body(shopService.getShopLocation(shopId));
+    }
+
+    @Override
+    public ResponseEntity<String> getShopStripeAccountId(String shopId) {
+        String stripeAccountId = shopService.getShopStripeAccountId(shopId);
+        return ResponseEntity.status(HttpStatus.OK).body(stripeAccountId);
+    }
+    
+    @Override
+    public ResponseEntity<String> updateShopStripeAccountId(String shopId, UpdateStripeAccountDto stripeAccountDto) {
+        String result = shopService.updateShopStripeAccountId(shopId, stripeAccountDto);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }
