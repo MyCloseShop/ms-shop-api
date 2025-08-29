@@ -125,6 +125,9 @@ public class ShopService implements IShopService {
                     .openingHoursIds(
                             shop.getOpeningHours().stream().map(OpeningHours::getId).toList()
                     )
+                    .createdAt(shop.getCreatedAt().toString())
+                    .updatedAt(shop.getUpdatedAt().toString())
+                    .isStripeConnected(shop.getStripeAccountId() != null)
                     .build();
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid shop id");
