@@ -1,6 +1,7 @@
 package com.etna.gpe.mycloseshop.ms_shop_api.dtos.shop;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,8 @@ public class ShopDto {
     private UUID ownerId;
     private List<UUID> openingHoursIds;
     private UUID locationId;
+    @JsonProperty("is_stripe_connected")
+    private boolean isStripeConnected;
+    private String createdAt;
+    private String updatedAt;
 }
