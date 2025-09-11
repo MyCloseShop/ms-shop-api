@@ -29,8 +29,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
           server-id: github-common-api,github-security-api
-          server-username: ${{ github.actor }},${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }},${{ secrets.GITHUB_TOKEN }}
+          server-username: GITHUB_ACTOR,GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE,TOKEN_PACKAGE
 
       - uses: actions/cache@v3
         with:
@@ -75,9 +75,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: TOKEN_PACKAGE
+          server-id: github-common-api,github-security-api
+          server-username: GITHUB_ACTOR,GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE,TOKEN_PACKAGE
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
@@ -123,9 +123,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: TOKEN_PACKAGE
+          server-id: github-common-api,github-security-api
+          server-username: GITHUB_ACTOR,GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE,TOKEN_PACKAGE
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
@@ -162,9 +162,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: TOKEN_PACKAGE
+          server-id: github-common-api,github-security-api
+          server-username: GITHUB_ACTOR,GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE,TOKEN_PACKAGE
 
       - name: Build final artifact
         run: mvn clean package -DskipTests
