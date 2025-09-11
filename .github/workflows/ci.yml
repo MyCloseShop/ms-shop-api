@@ -28,37 +28,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: github
-          server-username: USERNAME
-          server-password: TOKEN_PACKAGE
+          server-id: github,github-common-api,github-security-api
+          server-username: USERNAME,USERNAME,USERNAME
+          server-password: TOKEN_PACKAGE,TOKEN_PACKAGE,TOKEN_PACKAGE
         env:
           USERNAME: ${{ github.actor }}
           TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
-
-      # cat the settings.xml to the console for debugging purposes
-      - name: Print Maven settings.xml
-        env:
-          USERNAME: ${{ github.actor }}
-          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
-        run: cat ~/.m2/settings.xml
-
-      - name: Add GitHub package registry to Maven settings
-        env:
-          USERNAME: ${{ github.actor }}
-          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
-        run: |
-          SETTINGS_FILE="$HOME/.m2/settings.xml"
-          echo "[DEBUG] settings.xml before update:"
-          cat "$SETTINGS_FILE" || true
-
-          # Inject a profile that declares GitHub Packages and Central as repositories,
-          # and activate it so Maven can resolve private artifacts.
-          awk '/<\/settings>/ && !x {print "  <profiles>\n    <profile>\n      <id>github</id>\n      <repositories>\n        <repository>\n          <id>central</id>\n          <url>https://repo.maven.apache.org/maven2</url>\n        </repository>\n        <repository>\n          <id>github</id>\n          <url>https://maven.pkg.github.com/MyCloseShop</url>\n          <snapshots>\n            <enabled>true</enabled>\n          </snapshots>\n        </repository>\n      </repositories>\n    </profile>\n  </profiles>\n  <activeProfiles>\n    <activeProfile>github</activeProfile>\n  </activeProfiles>"; x=1 } 1' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-          mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-
-          echo "[DEBUG] settings.xml after update:"
-          cat "$SETTINGS_FILE"
-
 
       - uses: actions/cache@v3
         env:

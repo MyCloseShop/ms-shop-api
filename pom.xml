@@ -45,8 +45,18 @@
 	</properties>
     <repositories>
         <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/MyCloseShop</url>
+            <id>github-common-api</id>
+            <url>https://maven.pkg.github.com/MyCloseShop/common-api</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>github-security-api</id>
+            <url>https://maven.pkg.github.com/MyCloseShop/security-api</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 	<dependencies>
