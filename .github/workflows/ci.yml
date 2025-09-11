@@ -22,15 +22,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 21 + Maven settings
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          server-id: github,github-common-api,github-security-api
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
+          server-id: github-common-api,github-security-api
+          server-username: ${{ github.actor }},${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }},${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
