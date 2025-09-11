@@ -31,7 +31,10 @@ jobs:
           server-id: github
           server-username: ${{ github.actor }}
           server-password: ${{ secrets.TOKEN_PACKAGE }}
-
+          # cat the settings.xml to the console for debugging purposes
+          settings-path: ${{ github.workspace }}
+              
+      
       - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
