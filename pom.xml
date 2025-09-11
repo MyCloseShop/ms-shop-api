@@ -45,7 +45,7 @@
 	</properties>
     <repositories>
         <repository>
-            <id>github-common-api</id>
+            <id>github</id>
             <name>GitHub Packages - MyCloseShop/common-api</name>
             <url>https://maven.pkg.github.com/MyCloseShop/common-api</url>
             <releases>
@@ -56,7 +56,7 @@
             </snapshots>
         </repository>
         <repository>
-            <id>github-security-api</id>
+            <id>github</id>
             <name>GitHub Packages - MyCloseShop/security-api</name>
             <url>https://maven.pkg.github.com/MyCloseShop/security-api</url>
             <releases>

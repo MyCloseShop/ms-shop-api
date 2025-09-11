@@ -30,7 +30,7 @@ jobs:
           cache: maven
           server-id: github
           server-username: ${{ github.actor }}
-          server-password: ${{ secrets.TOKEN_PACKAGE }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
