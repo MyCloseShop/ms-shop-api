@@ -44,7 +44,7 @@ jobs:
       - name: Build
         run: |
           rm -rf ~/.m2/repository/com/etna/gpe/mycloseshop
-          mvn -B -U clean package -DskipTests
+          mvn -B -U clean package -DskipTests --settings /home/runner/.m2/settings.xml
 
       - name: Run tests
         run: mvn test -Dspring.profiles.active=test
