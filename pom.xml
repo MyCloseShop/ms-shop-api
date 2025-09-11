@@ -14,7 +14,15 @@
 	<name>ms-shop-api</name>
 	<description>Demo project for Spring Boot</description>
 
-	<!-- java version -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub MyCloseShop Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/MyCloseShop</url>
+        </repository>
+    </distributionManagement>
+
+    <!-- java version -->
 
 	<url/>
 	<licenses>
