@@ -15,6 +15,8 @@ jobs:
   test-and-build:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
     steps:
       - name: Checkout code
@@ -26,6 +28,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
@@ -33,12 +38,16 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+        env:
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
       - name: Validate Maven project
         run: mvn validate
 
       - name: Compile code
         run: mvn compile
+        env:
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
       - name: Run tests
         run: mvn test -Dspring.profiles.active=test
@@ -56,6 +65,8 @@ jobs:
   code-quality:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
+    env:
+      TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
     steps:
       - name: Checkout code
@@ -67,6 +78,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
@@ -99,6 +113,8 @@ jobs:
   security-scan:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
+    env:
+      TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
     steps:
       - name: Checkout code
@@ -110,6 +126,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE
 
       - name: Cache Maven dependencies
         uses: actions/cache@v3
@@ -133,6 +152,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     needs: [ code-quality, security-scan ]
+    env:
+      TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
     steps:
       - name: Checkout code
@@ -144,6 +165,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: TOKEN_PACKAGE
 
       - name: Build final artifact
         run: mvn clean package -DskipTests
