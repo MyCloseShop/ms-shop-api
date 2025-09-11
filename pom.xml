@@ -46,26 +46,11 @@
     <repositories>
         <repository>
             <id>github-common-api</id>
-            <name>GitHub Packages - MyCloseShop/common-api</name>
             <url>https://maven.pkg.github.com/MyCloseShop/common-api</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
         </repository>
-
         <repository>
             <id>github-security-api</id>
-            <name>GitHub Packages - MyCloseShop/security-api</name>
             <url>https://maven.pkg.github.com/MyCloseShop/security-api</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
         </repository>
     </repositories>
 	<dependencies>

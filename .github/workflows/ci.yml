@@ -29,8 +29,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
           server-id: github-common-api,github-security-api
-          server-username: GITHUB_ACTOR,GITHUB_ACTOR
-          server-password: TOKEN_PACKAGE,TOKEN_PACKAGE
+          server-username: ${{ github.actor }},${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }},${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/cache@v3
         with:
