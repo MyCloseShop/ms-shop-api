@@ -29,23 +29,39 @@ jobs:
           distribution: 'temurin'
           cache: maven
           server-id: github
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.TOKEN_PACKAGE }}
+          server-username: USERNAME
+          server-password: TOKEN_PACKAGE
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
       # cat the settings.xml to the console for debugging purposes
       - name: Print Maven settings.xml
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
         run: cat ~/.m2/settings.xml
 
+
       - uses: actions/cache@v3
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
       - name: Validate Maven project
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
         run: mvn validate
 
       - name: Build
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
         run: mvn -B -U clean package -DskipTests
 
       - name: Run tests
