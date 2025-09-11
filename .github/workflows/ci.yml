@@ -32,22 +32,19 @@ jobs:
           server-username: ${{ github.actor }},${{ github.actor }}
           server-password: ${{ secrets.GITHUB_TOKEN }},${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
+      - uses: actions/cache@v3
         with:
-          path: ~/.m2
+          path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-        env:
-          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
 
       - name: Validate Maven project
         run: mvn validate
 
-      - name: Compile code
-        run: mvn compile
-        env:
-          TOKEN_PACKAGE: ${{ secrets.TOKEN_PACKAGE }}
+      - name: Build
+        run: |
+          rm -rf ~/.m2/repository/com/etna/gpe/mycloseshop
+          mvn -B -U clean package -DskipTests
 
       - name: Run tests
         run: mvn test -Dspring.profiles.active=test
