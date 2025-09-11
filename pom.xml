@@ -14,7 +14,15 @@
 	<name>ms-shop-api</name>
 	<description>Demo project for Spring Boot</description>
 
-	<!-- java version -->
+    <!--    <distributionManagement>-->
+    <!--        <repository>-->
+    <!--            <id>github</id>-->
+    <!--            <name>GitHub MyCloseShop Apache Maven Packages</name>-->
+    <!--            <url>https://maven.pkg.github.com/MyCloseShop</url>-->
+    <!--        </repository>-->
+    <!--    </distributionManagement>-->
+
+    <!-- java version -->
 
 	<url/>
 	<licenses>
@@ -35,6 +43,22 @@
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<lombok.version>1.18.34</lombok.version>
 	</properties>
+    <repositories>
+        <repository>
+            <id>github-common-api</id>
+            <url>https://maven.pkg.github.com/MyCloseShop/common-api</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>github-security-api</id>
+            <url>https://maven.pkg.github.com/MyCloseShop/security-api</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
